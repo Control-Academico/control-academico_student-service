@@ -1,16 +1,25 @@
 server:
   port: 8082
+
 # Configuration Spring
 spring:
+
   # Configuration profile
   profiles:
     active: dev
+
   # Configuration application
   application:
     name: control-academic-student-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
     show-sql: true
 
   liquibase:
