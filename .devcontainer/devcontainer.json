@@ -4,7 +4,7 @@
   "service": "app",
   "workspaceFolder": "/workspace/control-academico_student-service",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "customizations": {
     "vscode": {
@@ -14,6 +14,6 @@
       ]
     }
   },
-  "forwardPorts": [8080, 5432],
+  "forwardPorts": [8080, 1521, 5500],
   "postCreateCommand": "chmod +x ./gradlew || true"
 }
