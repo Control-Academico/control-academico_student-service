@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -21,13 +19,13 @@ services:
     image: gvenzl/oracle-xe:21-slim
     restart: unless-stopped
     environment:
-      ORACLE_PASSWORD: studentpass      # Password para SYSTEM y usuario por defecto
-      APP_USER: student                 # Usuario app
+      ORACLE_PASSWORD: studentpass
+      APP_USER: student
       APP_USER_PASSWORD: studentpass
-      ORACLE_DATABASE: XEPDB1           # PDB por defecto
+      ORACLE_DATABASE: XEPDB1
     ports:
       - "1521:1521"
-      - "5500:5500"                     # Oracle Express Manager (opcional)
+      - "5500:5500"
     volumes:
       - oracle-data:/opt/oracle/oradata
 
