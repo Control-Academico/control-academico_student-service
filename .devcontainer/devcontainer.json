@@ -1,19 +1,35 @@
 {
-  "name": "Java 21 + Spring + DB",
-  "dockerComposeFile": "docker-compose.yml",
+  "name": "Spring Boot + Oracle",
+  "dockerComposeFile": "../docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspace/control-academico_student-service",
-  "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
-  },
+  "workspaceFolder": "/app",
+
   "customizations": {
     "vscode": {
       "extensions": [
         "vscjava.vscode-java-pack",
-        "pivotal.vscode-spring-boot"
+        "pivotal.vscode-spring-boot",
+        "ms-vscode.vscode-docker"
       ]
     }
   },
-  "forwardPorts": [8080, 1521, 5500],
-  "postCreateCommand": "chmod +x ./gradlew || true"
+
+  "forwardPorts": [8080, 1521, 5005],
+  "portsAttributes": {
+    "8080": {
+      "label": "Spring Boot",
+      "onAutoForward": "openBrowser"
+    },
+    "1521": {
+      "label": "Oracle DB",
+      "onAutoForward": "ignore"
+    },
+    "5005": {
+      "label": "Debug Port",
+      "onAutoForward": "ignore"
+    }
+  },
+
+  "postCreateCommand": "echo 'Environment ready! App will start automatically.'",
+  "remoteUser": "root"
 }
