@@ -1,57 +1,138 @@
+import java.time.LocalDate
+
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.5.3"
-    id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.jpa") version "1.9.25"
+    kotlin("jvm") version "1.9.25" apply false
+    id("java-library")
+    id("org.springframework.boot") version "3.5.3" apply false
+    id("io.spring.dependency-management") version "1.1.7" apply false
+    kotlin("plugin.spring") version "1.9.25" apply false
+    kotlin("plugin.jpa") version "1.9.25" apply false
+    kotlin("kapt") version "1.9.25" apply false
+    kotlin("plugin.noarg") version "1.9.25" apply false
 }
 
-group = "com.development"
-version = "0.0.1-SNAPSHOT"
+allprojects{
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+    group = "com.development"
+    version = "0.0.1-SNAPSHOT"
+
+    repositories {
+
+        maven {
+            url = uri("http://5.189.132.17:8081/repository/maven-releases-control-academico/")
+            isAllowInsecureProtocol = true
+        }
+        maven {
+            url = uri("http://5.189.132.17:8081/repository/maven-snapshots-control-academico/")
+            isAllowInsecureProtocol = true
+        }
+
+        mavenCentral()
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "21"
+        }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
+subprojects {
+
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin="java-library")
+    apply(plugin="io.spring.dependency-management")
+
+    dependencies {
+
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+        testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    }
+
+    the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply{
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.3")
+        }
+    }
+
+}
+
+tasks.register("info"){
+    group = "Info-Details"
+    description = "Info Details"
+
+    val name = project.name
+    val version = project.version
+    val java = System.getProperty("java.version")
+
+    doLast {
+        println("Name: $name")
+        println("Version: $version")
+        println("Java: $java")
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.liquibase:liquibase-core")
-    compileOnly("org.projectlombok:lombok")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("com.oracle.database.jdbc:ojdbc11")
-    annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict")
+tasks.register("System-Info"){
+    doLast {
+        println("OS: ${System.getenv("OS")}")
     }
 }
 
-allOpen {
-    annotation("jakarta.persistence.Entity")
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("jakarta.persistence.Embeddable")
+val saludo = tasks.register("saludo"){
+    doLast {
+        println("Buenos dias")
+    }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+tasks.register("despedida"){
+    dependsOn(saludo)
+    doLast {
+        println("Buenas noches")
+    }
+}
+
+tasks.register("task-condicional"){
+    doLast {
+        println("Env: ${System.getenv("CUSTOM_ENV")}")
+    }
+    onlyIf { System.getenv("CUSTOM_ENV") != null }
+}
+
+tasks.register("create-file-info-system"){
+
+    dependsOn("build")
+
+    doLast {
+
+        val dirInfo = File("docs")
+        if(!dirInfo.exists()){
+            dirInfo.mkdirs()
+        }
+
+        val file = File(dirInfo, "info.md")
+        if(file.exists()){
+            file.delete()
+        }
+
+        file.writeText("# Info \n")
+        file.appendText("- Name: ${project.name} \n")
+        file.appendText("- Versión: ${project.version} \n")
+        file.appendText("- Date: ${LocalDate.now()} \n")
+        file.appendText("- User: ${System.getProperty("user.name")} \n")
+    }
+}
+
+/*
+    - Para ejecutar instrucciones cuando se ejecute una tarea nativa se usa tasks.named("<tarea>")
+    - Para indicar que una tarea se ejecute al finalizar otra tarea se usa finalizedBy("<tarea>")
+ */
+tasks.named("build"){
+    finalizedBy("create-file-info-system")
 }

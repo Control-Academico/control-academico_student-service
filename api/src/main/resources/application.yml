@@ -1,0 +1,25 @@
+server:
+  port: 8082
+# Configuration Spring
+spring:
+  # Configuration profile
+  profiles:
+    active: dev
+  # Configuration application
+  application:
+    name: control-academic-student-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  liquibase:
+    changeLog: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+# Configuration Logging
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
