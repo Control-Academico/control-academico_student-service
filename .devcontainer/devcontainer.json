@@ -2,7 +2,7 @@
   "name": "Spring Boot + Oracle",
   "dockerComposeFile": "../docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/app",
+  "workspaceFolder": "/app/control-academico_student-service",
 
   "customizations": {
     "vscode": {
