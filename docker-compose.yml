@@ -1,57 +1,35 @@
 version: '3.8'
 
 services:
-  # Aplicación Spring Boot
   app:
-    build: .
-    container_name: spring-app
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspaces/${localWorkspaceFolderBasename}:cached
+    command: sleep infinity
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle-db:1521/XEPDB1
+      SPRING_DATASOURCE_USERNAME: student
+      SPRING_DATASOURCE_PASSWORD: studentpass
+    depends_on:
+      - oracle-db
     ports:
       - "8080:8080"
-      - "5005:5005"  # Puerto para debug remoto
-    environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - DATABASE_URL=jdbc:oracle:thin:@oracle-db:1521:XE
-      - DATABASE_USERNAME=system
-      - DATABASE_PASSWORD=oracle
-    volumes:
-      - ./src:/app/src          # Hot reload para código
-      - ./pom.xml:/app/pom.xml  # Hot reload para dependencies
-      - maven-cache:/root/.m2   # Cache de Maven
-    depends_on:
-      oracle-db:
-        condition: service_healthy
-    networks:
-      - app-network
-    restart: unless-stopped
 
-  # Base de datos Oracle
   oracle-db:
     image: gvenzl/oracle-xe:21-slim
-    container_name: oracle-db
+    restart: unless-stopped
     environment:
-      - ORACLE_PASSWORD=oracle
-      - ORACLE_DATABASE=XE
-      - ORACLE_RANDOM_PASSWORD=false
-      - ORACLE_ALLOW_REMOTE=true
+      ORACLE_PASSWORD: studentpass      # Password para SYSTEM y usuario por defecto
+      APP_USER: student                 # Usuario app
+      APP_USER_PASSWORD: studentpass
+      ORACLE_DATABASE: XEPDB1           # PDB por defecto
     ports:
       - "1521:1521"
+      - "5500:5500"                     # Oracle Express Manager (opcional)
     volumes:
       - oracle-data:/opt/oracle/oradata
-      - ./scripts/init:/container-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD", "healthcheck.sh"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
-    networks:
-      - app-network
-    restart: unless-stopped
 
 volumes:
   oracle-data:
-  maven-cache:
-
-networks:
-  app-network:
-    driver: bridge

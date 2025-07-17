@@ -1,35 +1,19 @@
 {
-  "name": "Spring Boot + Oracle",
-  "dockerComposeFile": "../docker-compose.yml",
+  "name": "Java + DB + Docker",
+  "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/app/control-academico_student-service",
-
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
         "vscjava.vscode-java-pack",
-        "pivotal.vscode-spring-boot",
-        "ms-vscode.vscode-docker"
+        "pivotal.vscode-spring-boot"
       ]
     }
   },
-
-  "forwardPorts": [8080, 1521, 5005],
-  "portsAttributes": {
-    "8080": {
-      "label": "Spring Boot",
-      "onAutoForward": "openBrowser"
-    },
-    "1521": {
-      "label": "Oracle DB",
-      "onAutoForward": "ignore"
-    },
-    "5005": {
-      "label": "Debug Port",
-      "onAutoForward": "ignore"
-    }
-  },
-
-  "postCreateCommand": "echo 'Environment ready! App will start automatically.'",
-  "remoteUser": "root"
+  "forwardPorts": [8080, 5432, 1521], // Cambia según el puerto de tu app y DB
+  "postCreateCommand": "chmod +x ./gradlew || true"
 }
