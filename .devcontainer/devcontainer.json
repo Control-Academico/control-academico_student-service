@@ -2,7 +2,7 @@
   "name": "Java 21 + Spring + DB",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspace/control-academico_student-service",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:1": {}
   },
